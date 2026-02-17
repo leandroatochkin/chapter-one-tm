@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react'
 import {
   Text,
   View,
@@ -6,15 +6,16 @@ import {
   Modal,
   TextInput,
   ViewStyle
-} from 'react-native';
+} from 'react-native'
 import { 
     styles
- } from '../lib/styles';
+ } from '../lib/styles'
 import { 
     themeFunction,
     reminderOptions
- } from '../lib/utils';
-import { FormErrors } from '../lib/interfaces';
+ } from '../lib/utils'
+import { FormErrors } from '../lib/interfaces'
+import DateTimePicker from '@react-native-community/datetimepicker'
 
 interface AddTaskModalProps {
     showAddModal: boolean
@@ -28,9 +29,11 @@ interface AddTaskModalProps {
     taskDescription: string
     setTaskDescription: (description: string) => void
     selectedReminder: number | null
-    setSelectedReminder: (value: number) => void,
+    setSelectedReminder: (value: number | null) => void,
     addTask: () => void
     getAlignmentStyle: () => ViewStyle
+    setDeadline: (date: Date | null) => void
+    deadline: Date | null;
 }
 
 
@@ -48,10 +51,23 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
     selectedReminder,
     setSelectedReminder,
     addTask,
-    getAlignmentStyle
+    getAlignmentStyle,
+    setDeadline,
+    deadline
 }) => {
-
+    
+    const [showPicker, setShowPicker] = useState<boolean>(false);
     const theme = themeFunction(isDarkMode)
+
+    const onDateChange = (event: any, selectedDate?: Date) => {
+        setShowPicker(false);
+        if (selectedDate) {
+            setDeadline(selectedDate);
+        } else {
+            setDeadline(null)
+            setSelectedReminder(null)
+        }
+    }
 
     return (
         <Modal
@@ -101,20 +117,47 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                       numberOfLines={4}
                     />
                     {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
-        
-                    <Text style={[styles.sectionLabel, { color: theme.text }]}>
-                      Set Reminder (Optional)
+
+                    <Text style={[styles.sectionLabel, { color: theme.text, marginTop: 15 }]}>
+                      Deadline (Optional)
                     </Text>
-                    <View style={styles.reminderOptions}>
+
+                    <TouchableOpacity 
+                      style={[styles.input, { justifyContent: 'center', borderColor: theme.border }]}
+                      onPress={() => setShowPicker(true)}
+                    >
+                      <Text style={{ color: deadline ? theme.text : theme.text + '80' }}>
+                        {deadline ? deadline.toLocaleDateString() : "Select a date..."}
+                      </Text>
+                    </TouchableOpacity>
+
+                    {showPicker && (
+                      <DateTimePicker
+                        value={deadline || new Date()}
+                        mode="date"
+                        display="default"
+                        onChange={onDateChange}
+                        minimumDate={new Date()} // Prevent past dates
+                      />
+                    )}
+        
+                    <Text style={[styles.sectionLabel, { color: theme.text, marginTop: 20 }]}>
+                      Set Reminder (Optional) 
+                      {!deadline && <Text style={{ fontSize: 10, color: '#f44336' }}> (Select deadline first)</Text>}
+                    </Text>
+
+                    <View style={[styles.reminderOptions, !deadline && { opacity: 0.5 }]}>
                       {reminderOptions.map((option) => (
                         <TouchableOpacity
                           key={option.value}
+                          disabled={!deadline} // <--- Disable if no deadline
                           style={[
                             styles.reminderOption,
                             selectedReminder === option.value && {
                               backgroundColor: theme.accent,
                             },
                             { borderColor: theme.border },
+                            !deadline && { backgroundColor: theme.border + '40' } // Visual feedback
                           ]}
                           onPress={() => setSelectedReminder(option.value)}
                         >
@@ -122,8 +165,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                             style={[
                               styles.reminderOptionText,
                               {
-                                color:
-                                  selectedReminder === option.value ? '#FFF' : theme.text,
+                                color: selectedReminder === option.value ? '#FFF' : theme.text,
                               },
                             ]}
                           >

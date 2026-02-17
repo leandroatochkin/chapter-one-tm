@@ -1,58 +1,45 @@
+import React from "react"
 import { 
+    TouchableOpacity,
     View,
-    Text,
-    ScrollView,
-    TouchableOpacity
-} from "react-native";
-import { 
-    themeFunction
- } from "../lib/utils";
-import { 
-    Task
- } from "../lib/interfaces";
-import { 
-    styles
- } from "../lib/styles";
+    Text    
+} from "react-native"
 import { 
     Ionicons
- } from '@expo/vector-icons';
+ } from "@expo/vector-icons"
+import { 
+    Task
+} from "../lib/interfaces"
+import { 
+    styles
+ } from "../lib/styles"
+import { 
+    themeFunction
+ } from "../lib/utils"
 
 
-interface MainScreenProps {
+interface TaskCardProps {
+    task: Task
     setSelectedTask: (task: Task) => void
     setShowTaskModal: (mode: boolean) => void
-    setShowAddModal: (mode: boolean) => void
-    deleteTask: (id: string) => void
-    completeTask: (id: string) => void
-    tasks: Task[] | []
     isDarkMode: boolean
+    completeTask: (taskId: string) => void
+    deleteTask: (taskId: string) => void
 }
 
-const MainScreen: React.FC<MainScreenProps> = ({
+export const TaskCard: React.FC<TaskCardProps> = ({
+    task,
+    isDarkMode,
     setSelectedTask,
     setShowTaskModal,
-    setShowAddModal,
-    deleteTask,
     completeTask,
-    tasks,
-    isDarkMode  
+    deleteTask
 }) => {
 
-   const theme = themeFunction(isDarkMode)
+    const theme = themeFunction(isDarkMode)
 
     return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.header, { color: theme.text }]}>My Tasks</Text>
-      <ScrollView style={styles.taskList} showsVerticalScrollIndicator={false}>
-        {tasks.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={[styles.emptyText, { color: theme.text }]}>
-              No tasks yet. Tap + to add one!
-            </Text>
-          </View>
-        ) : (
-          tasks.map((task) => (
-            <TouchableOpacity
+        <TouchableOpacity
               key={task.id}
               style={[styles.taskCard, { backgroundColor: theme.cardBackground }]}
               onPress={() => {
@@ -103,19 +90,5 @@ const MainScreen: React.FC<MainScreenProps> = ({
                 </View>
               </View>
             </TouchableOpacity>
-          ))
-        )}
-      </ScrollView>
-
-      {/* Floating Add Button */}
-      <TouchableOpacity
-        style={[styles.floatingButton, { backgroundColor: theme.accent }]}
-        onPress={() => setShowAddModal(true)}
-      >
-        <Text style={styles.floatingButtonText}>+</Text>
-      </TouchableOpacity>
-    </View>
     )
-};
-
-export default MainScreen
+}
