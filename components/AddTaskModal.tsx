@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  ViewStyle
+  ViewStyle,
+  Platform
 } from 'react-native'
 import { 
     styles
@@ -15,7 +16,9 @@ import {
     reminderOptions
  } from '../lib/utils'
 import { FormErrors } from '../lib/interfaces'
-import DateTimePicker from '@react-native-community/datetimepicker'
+import { MobileDatePicker } from './DatePicker'
+import { WebDatePicker } from './DatePickerWeb'
+
 
 interface AddTaskModalProps {
     showAddModal: boolean
@@ -122,23 +125,30 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                       Deadline (Optional)
                     </Text>
 
-                    <TouchableOpacity 
-                      style={[styles.input, { justifyContent: 'center', borderColor: theme.border }]}
-                      onPress={() => setShowPicker(true)}
-                    >
-                      <Text style={{ color: deadline ? theme.text : theme.text + '80' }}>
-                        {deadline ? deadline.toLocaleDateString() : "Select a date..."}
-                      </Text>
-                    </TouchableOpacity>
-
-                    {showPicker && (
-                      <DateTimePicker
-                        value={deadline || new Date()}
-                        mode="date"
-                        display="default"
-                        onChange={onDateChange}
-                        minimumDate={new Date()} // Prevent past dates
+                    {Platform.OS === 'web' ? (
+                      <WebDatePicker 
+                        value={deadline} 
+                        onChange={onDateChange} 
+                        theme={theme} 
                       />
+                    ) : (
+                      <>
+                        <TouchableOpacity 
+                          style={[styles.input, { justifyContent: 'center', borderColor: theme.border }]}
+                          onPress={() => setShowPicker(true)}
+                        >
+                          <Text style={{ color: deadline ? theme.text : theme.text + '80' }}>
+                            {deadline ? deadline.toLocaleDateString() : "Select a date..."}
+                          </Text>
+                        </TouchableOpacity>
+
+                        {showPicker && (
+                          <MobileDatePicker
+                            value={deadline || new Date()}
+                            onChange={onDateChange}
+                          />
+                        )}
+                      </>
                     )}
         
                     <Text style={[styles.sectionLabel, { color: theme.text, marginTop: 20 }]}>

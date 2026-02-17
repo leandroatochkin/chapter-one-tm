@@ -56,14 +56,20 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                     {task.description}
                   </Text>
                   {task.deadline && (
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 4 }}>
+                        <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                        <Ionicons name="calendar-outline" size={12} color={theme.text}/>
                         <Text style={{ fontSize: 12, color: isDarkMode ? '#aaa' : '#666' }}>
-                          📅 Due: {new Date(task.deadline).toLocaleDateString()}
+                         Due: {new Date(task.deadline).toLocaleDateString()}
                         </Text>
+                        </View>
                         {task.reminder && (
-                          <Text style={{ fontSize: 12, color: theme.accent, marginLeft: 10 }}>
-                            🔔 Reminder set
+                          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                          <Ionicons name="alarm-outline" size={12} color={theme.accent}/>  
+                          <Text style={{ fontSize: 12, color: theme.accent, marginLeft: 2 }}>
+                           Reminder set
                           </Text>
+                          </View>
                         )}
                       </View>
                     )}
