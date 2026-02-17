@@ -13,9 +13,7 @@ import {
 import { 
     styles
  } from "../lib/styles";
-import { 
-    Ionicons
- } from '@expo/vector-icons';
+ import { TaskCard } from "@/components/TaskCard";
 
 
 interface MainScreenProps {
@@ -52,57 +50,15 @@ const MainScreen: React.FC<MainScreenProps> = ({
           </View>
         ) : (
           tasks.map((task) => (
-            <TouchableOpacity
-              key={task.id}
-              style={[styles.taskCard, { backgroundColor: theme.cardBackground }]}
-              onPress={() => {
-                setSelectedTask(task);
-                setShowTaskModal(true);
-              }}
-            >
-              <View style={styles.taskCardContent}>
-                <View style={styles.taskInfo}>
-                  <Text style={[styles.taskTitle, { color: theme.text }]} numberOfLines={1}>
-                    {task.title}
-                  </Text>
-                  <Text style={[styles.taskPreview, { color: theme.text }]} numberOfLines={2}>
-                    {task.description}
-                  </Text>
-                  {task.deadline && (
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-                        <Text style={{ fontSize: 12, color: isDarkMode ? '#aaa' : '#666' }}>
-                          📅 Due: {new Date(task.deadline).toLocaleDateString()}
-                        </Text>
-                        {task.reminder && (
-                          <Text style={{ fontSize: 12, color: theme.accent, marginLeft: 10 }}>
-                            🔔 Reminder set
-                          </Text>
-                        )}
-                      </View>
-                    )}
-                </View>
-                <View style={styles.taskActions}>
-                  <TouchableOpacity
-                    style={[styles.actionButton, styles.completeButton]}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      completeTask(task.id);
-                    }}
-                  >
-                     <Ionicons name={'checkmark-outline'} size={12} color={'#4CAF50'}/>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.actionButton, styles.deleteButton]}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      deleteTask(task.id);
-                    }}
-                  >
-                    <Ionicons name={'trash-outline'} size={12} color={'#f44336'}/>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableOpacity>
+            <TaskCard
+              key={task.id} 
+              task={task}
+              isDarkMode={isDarkMode}
+              setSelectedTask={setSelectedTask}
+              setShowTaskModal={setShowTaskModal}
+              completeTask={completeTask}
+              deleteTask={deleteTask}
+            />
           ))
         )}
       </ScrollView>

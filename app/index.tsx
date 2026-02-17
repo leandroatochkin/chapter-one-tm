@@ -15,6 +15,9 @@ import { styles } from '../lib/styles'
 import { Alignment, Screens } from '../lib/interfaces'
 import { themeFunction } from '../lib/utils'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as Haptics from 'expo-haptics'
+import { showToast } from '@/lib/notifications'
+import { RootSiblingParent } from 'react-native-root-siblings'
 
 
 
@@ -144,6 +147,8 @@ const addTask = () => {
   setDeadline(null)
   resetForm()
   setShowAddModal(false)
+  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+  showToast('Task added!', isDarkMode)
 }
 
   const resetForm = () => {
@@ -163,6 +168,8 @@ const addTask = () => {
       setTasks(tasks.filter((t) => t.id !== taskId))
       setShowTaskModal(false)
       setSelectedTask(null)
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+      showToast('Task completed! Well done!', isDarkMode)
     }
   };
 
@@ -176,6 +183,8 @@ const addTask = () => {
       setTasks(tasks.filter((t) => t.id !== taskId))
       setShowTaskModal(false)
       setSelectedTask(null)
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
+      showToast('Task deleted.', isDarkMode)
     }
   };
 
@@ -189,6 +198,7 @@ const addTask = () => {
     }
     delete newTask.archivedAt
     setTasks([...tasks, newTask])
+    showToast('Task added!', isDarkMode)
   }
 
   const updateTask = (updatedTask: Task) => {
@@ -196,10 +206,12 @@ const addTask = () => {
         prevTasks.map(t => t.id === updatedTask.id ? updatedTask : t)
     )   
     setSelectedTask(updatedTask)
+    showToast('Task updated!', isDarkMode)
 }
 
   const removeFromArchive = (taskId: string) => {
     setArchivedTasks(archivedTasks.filter((t) => t.id !== taskId))
+    showToast('Task deleted permanently.', isDarkMode)
   }
 
   if (isLoading) {
@@ -257,7 +269,8 @@ const addTask = () => {
   
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
+    <RootSiblingParent>
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.background }]}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={theme.background}
@@ -304,6 +317,7 @@ const addTask = () => {
         deleteTask={deleteTask}
       />
     </SafeAreaView>
+    </RootSiblingParent>
   )
 }
 
