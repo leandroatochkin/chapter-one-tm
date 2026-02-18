@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { 
-    View, 
-    Text, 
-    Animated, 
-    Image
-} from "react-native"
-import { styles } from "../lib/styles"
-import { themeFunction } from "../lib/utils" // Import theme helper
+import React, { useEffect, useState } from "react";
+import {
+    Animated,
+    Text,
+    View
+} from "react-native";
+import { styles } from "../lib/styles";
+import { themeFunction } from "../lib/utils";
 
 interface LoadingScreenProps {
     onLoadingComplete: () => void
@@ -21,14 +20,15 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
     const [progress] = useState(new Animated.Value(0))
 
     useEffect(() => {
+        Animated.delay(500)
         Animated.timing(progress, {
             toValue: 1,
             duration: 3000,
-            useNativeDriver: false,
+            useNativeDriver: true,
         }).start(() => {
             setTimeout(onLoadingComplete, 100)
         })
-    }, [onLoadingComplete, progress])
+    }, [])
 
     const translateX = progress.interpolate({
         inputRange: [0, 1],
@@ -41,12 +41,6 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
             { backgroundColor: theme.background } 
         ]}>
             
-            <Image 
-                source={require('../assets/images/logo3.png')} 
-                style={{ width: 100, height: 100, marginBottom: 20 }}
-                resizeMode="contain"
-            />
-
             <Text style={[styles.loadingTitle, { color: theme.text }]}>
                 Task Manager
             </Text>

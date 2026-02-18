@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react'
+import { AddTaskModal } from '@/components/AddTaskModal';
+import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal';
+import { NavigationBar } from '@/components/NavigationBar';
+import { TaskDetailModal } from '@/components/TaskDetailModal';
+import { showToast } from '@/lib/notifications';
+import ArchiveScreen from '@/screens/ArchiveScreen';
+import LoadingScreen from '@/screens/LoadingScreen';
+import MainScreen from '@/screens/MainScreen';
+import SettingsScreen from '@/screens/SettingsScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Haptics from 'expo-haptics';
+import React, { useEffect, useState } from 'react';
 import {
   StatusBar
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context'
-import MainScreen from '@/screens/MainScreen'
-import SettingsScreen from '@/screens/SettingsScreen'
-import ArchiveScreen from '@/screens/ArchiveScreen'
-import LoadingScreen from '@/screens/LoadingScreen'
-import { AddTaskModal } from '@/components/AddTaskModal'
-import { TaskDetailModal } from '@/components/TaskDetailModal'
-import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal';
-import { NavigationBar } from '@/components/NavigationBar'
-import { styles } from '../lib/styles'
-import { Screens } from '../lib/interfaces'
-import { themeFunction } from '../lib/utils'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import * as Haptics from 'expo-haptics'
-import { showToast } from '@/lib/notifications'
-import { RootSiblingParent } from 'react-native-root-siblings'
+import { RootSiblingParent } from 'react-native-root-siblings';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Screens } from '../lib/interfaces';
+import { styles } from '../lib/styles';
+import { themeFunction } from '../lib/utils';
 
 
 
@@ -39,7 +39,8 @@ interface Task {
 }
 
 export default function Index() {
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isDataLoaded, setIsDataLoaded] = useState<boolean>(false) 
+  const [isAnimationDone, setIsAnimationDone] = useState<boolean>(false)
   const [tasks, setTasks] = useState<Task[]>([])
   const [archivedTasks, setArchivedTasks] = useState<Task[]>([])
   const [currentScreen, setCurrentScreen] = useState<Screens>('main') // main, archive, settings
@@ -63,7 +64,6 @@ export default function Index() {
   //load data on startup
   useEffect(() => {
     const loadData = async () => {
-      setIsLoading(true)
       try {
         const savedTasks = await AsyncStorage.getItem('tasks')
         const savedArchive = await AsyncStorage.getItem('archivedTasks')
@@ -83,7 +83,7 @@ export default function Index() {
       } catch (e) {
         console.error("Failed to load data", e)
       } finally {
-        setIsLoading(false)
+        setIsDataLoaded(true)
       }
     }
     loadData()
@@ -91,7 +91,7 @@ export default function Index() {
 
   //save Tasks and Archive whenever they change
   useEffect(() => {
-    if (!isLoading) {
+    if (isDataLoaded) {
       const saveData = async () => {
         try {
           await AsyncStorage.setItem('tasks', JSON.stringify(tasks))
@@ -102,7 +102,7 @@ export default function Index() {
       }
       saveData()
     }
-  }, [tasks, archivedTasks, isLoading])
+  }, [tasks, archivedTasks, isDataLoaded])
 
   //save Settings whenever they change
   useEffect(() => {
@@ -223,11 +223,11 @@ export default function Index() {
     }
   }
 
-  if (isLoading) {
+  if (!isDataLoaded || !isAnimationDone) {
     return <LoadingScreen 
-              onLoadingComplete={() => setIsLoading(false)} 
+              onLoadingComplete={() => setIsAnimationDone(true)} 
               isDarkMode={isDarkMode}
-              />
+           />
   }
 
   const renderMainScreen = () => {
