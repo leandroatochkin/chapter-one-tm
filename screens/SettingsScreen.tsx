@@ -10,25 +10,19 @@ import {
 import { 
     styles
  } from "../lib/styles";
- import { 
-    Alignment
- } from "../lib/interfaces";
-
 
  interface SettingScreenProps {
     isDarkMode: boolean,
     setIsDarkMode: (mode: boolean) => void
-    getAlignmentStyle: () => ViewStyle
-    setButtonAlignment: (align: Alignment) => void
-    buttonAlignment: string
+    showDeleteWarning: boolean
+    setShowDeleteWarning: (val: boolean) => void
  }
 
 const SettingsScreen: React.FC<SettingScreenProps> = ({
     isDarkMode,
     setIsDarkMode,
-    getAlignmentStyle,
-    setButtonAlignment,
-    buttonAlignment
+    showDeleteWarning,
+    setShowDeleteWarning
  }) => {
 
     const theme = themeFunction(isDarkMode)
@@ -37,7 +31,6 @@ const SettingsScreen: React.FC<SettingScreenProps> = ({
         <View style={[styles.container, { backgroundColor: theme.background }]}>
             <Text style={[styles.header, { color: theme.text }]}>Settings</Text>
             <View style={styles.settingsContent}>
-                {/* Dark Mode Toggle */}
                 <View style={styles.settingItem}>
                 <Text style={[styles.settingLabel, { color: theme.text }]}>Dark Mode</Text>
                 <TouchableOpacity
@@ -56,36 +49,14 @@ const SettingsScreen: React.FC<SettingScreenProps> = ({
                     />
                 </TouchableOpacity>
                 </View>
-        
-                {/* Button Alignment */}
                 <View style={styles.settingItem}>
-                <Text style={[styles.settingLabel, { color: theme.text }]}>
-                    Button Alignment
-                </Text>
-                </View>
-                <View style={[styles.alignmentButtons, getAlignmentStyle()]}>
-                {(['left', 'center', 'right'] as const).map((align) => (
+                    <Text style={[styles.settingLabel, { color: theme.text }]}>Delete Confirmation</Text>
                     <TouchableOpacity
-                    key={align}
-                    style={[
-                        styles.alignmentButton,
-                        buttonAlignment === align && {
-                        backgroundColor: theme.accent,
-                        },
-                        { borderColor: theme.border },
-                    ]}
-                    onPress={() => setButtonAlignment(align)}
+                        style={[styles.toggle, { backgroundColor: showDeleteWarning ? theme.accent : '#CCC' }]}
+                        onPress={() => setShowDeleteWarning(!showDeleteWarning)}
                     >
-                    <Text
-                        style={[
-                        styles.alignmentButtonText,
-                        { color: buttonAlignment === align ? '#FFF' : theme.text },
-                        ]}
-                    >
-                        {align.charAt(0).toUpperCase() + align.slice(1)}
-                    </Text>
+                        <View style={[styles.toggleThumb, showDeleteWarning && styles.toggleThumbActive]} />
                     </TouchableOpacity>
-                ))}
                 </View>
             </View>
         </View>

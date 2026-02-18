@@ -56,7 +56,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
                     style={[
                         styles.loadingBar,
                         {
-                            backgroundColor: theme.accent, // Progress bar matches accent color
+                            backgroundColor: theme.accent, 
                             transform: [{ translateX }],
                         },
                     ]}

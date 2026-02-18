@@ -87,10 +87,11 @@ export const styles = StyleSheet.create({
   floatingButton: {
     position: 'absolute',
     right: 20,
-    bottom: 80,
+    bottom: 40,
     width: 60,
     height: 60,
     borderRadius: 30,
+    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
@@ -103,12 +104,13 @@ export const styles = StyleSheet.create({
     fontSize: 32,
     color: '#FFF',
     fontWeight: '300',
+    marginBottom: 4
   },
   bottomNav: {
     flexDirection: 'row',
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
-    paddingBottom: 36,
+    paddingBottom: 20,
   },
   navButton: {
     flex: 1,
@@ -179,12 +181,13 @@ export const styles = StyleSheet.create({
   },
   modalButtons: {
     flexDirection: 'row',
+    justifyContent: 'flex-end',
     gap: 12,
     marginTop: 20,
   },
   modalButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
     borderRadius: 8,
   },
   modalButtonText: {

@@ -10,11 +10,9 @@ export interface Task {
   reminder: number | null
   completed: boolean
   deadline?: string | null
-  deleted?: boolean // Optional for archive logic
+  deleted?: boolean 
   createdAt: Date
   archivedAt?: Date
 }
-
-export type Alignment = 'left' | 'center' | 'right'
 
 export type Screens = 'main' | 'archive' | 'settings'

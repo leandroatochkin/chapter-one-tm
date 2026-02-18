@@ -1,12 +1,12 @@
-import React from 'react';
+import React from 'react'
 import {
   Text,
   View,
   TouchableOpacity,
-} from 'react-native';
-import { styles } from '../lib/styles';
-import { themeFunction } from '../lib/utils';
-import { Screens } from '../lib/interfaces';
+} from 'react-native'
+import { styles } from '../lib/styles'
+import { themeFunction } from '../lib/utils'
+import { Screens } from '../lib/interfaces'
 
 interface NavigationBarProps {
     isDarkMode: boolean

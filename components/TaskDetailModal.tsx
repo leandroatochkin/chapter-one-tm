@@ -4,7 +4,6 @@ import {
   View,
   TouchableOpacity,
   Modal,
-  ViewStyle,
   ScrollView,
   TextInput,
   Platform
@@ -23,7 +22,6 @@ interface TaskDetailModalProps {
   setSelectedTask: (task: Task | null) => void
   selectedTask: Task | null
   updateTask: (updatedTask: Task) => void
-  getAlignmentStyle: () => ViewStyle
   completeTask: (taskId: string) => void
   deleteTask: (taskId: string) => void
 }
@@ -35,17 +33,16 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   setSelectedTask,
   selectedTask,
   updateTask,
-  getAlignmentStyle,
   completeTask,
   deleteTask
 }) => {
   const theme = themeFunction(isDarkMode)
 
-  const [isEditing, setIsEditing] = useState(false)
-  const [editedTitle, setEditedTitle] = useState('')
-  const [editedDesc, setEditedDesc] = useState('')
+  const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [editedTitle, setEditedTitle] = useState<string>('')
+  const [editedDesc, setEditedDesc] = useState<string>('')
   const [editedDeadline, setEditedDeadline] = useState<Date | null>(null)
-  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false)
 
   useEffect(() => {
     if (selectedTask) {
@@ -99,10 +96,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
           
-          <View style={[
-            { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 },
-            getAlignmentStyle().alignItems === 'flex-end' ? { flexDirection: 'row-reverse' } : {}
-          ]}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
             <View style={{ flex: 1 }}>
               {isEditing ? (
                 <TextInput
@@ -218,14 +212,15 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             )}
           </ScrollView>
 
-          <View style={[styles.modalButtons, getAlignmentStyle(), { marginTop: 20 }]}>
+          <View style={styles.modalButtons}>
             {isEditing ? (
               <>
                 <TouchableOpacity style={[styles.modalButton, { backgroundColor: '#4CAF50' }]} onPress={handleSave}>
                   <Text style={styles.modalButtonText}>Save</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.modalButton, { backgroundColor: '#CCC' }]} onPress={() => setIsEditing(false)}>
-                  <Text style={styles.modalButtonText}>Cancel</Text>
+                  <Text 
+                    style={styles.modalButtonText}>Cancel</Text>
                 </TouchableOpacity>
               </>
             ) : (
@@ -233,10 +228,20 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 <TouchableOpacity style={[styles.modalButton, { backgroundColor: theme.accent }]} onPress={() => setIsEditing(true)}>
                   <Text style={styles.modalButtonText}>Edit</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.modalButton, { backgroundColor: '#4CAF50' }]} onPress={() => { completeTask(selectedTask.id); handleClose(); }}>
+                <TouchableOpacity 
+                  style={[styles.modalButton, { backgroundColor: '#4CAF50' }]} 
+                  onPress={() => { 
+                                  completeTask(selectedTask.id)
+                                  handleClose()
+                                    }}>
                   <Text style={styles.modalButtonText}>Done</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.modalButton, { backgroundColor: '#f44336' }]} onPress={() => { deleteTask(selectedTask.id); handleClose(); }}>
+                <TouchableOpacity 
+                  style={[styles.modalButton, { backgroundColor: '#f44336' }]} 
+                  onPress={() => { 
+                                  deleteTask(selectedTask.id) 
+                                  handleClose() 
+                                    }}>
                   <Text style={styles.modalButtonText}>Delete</Text>
                 </TouchableOpacity>
               </>

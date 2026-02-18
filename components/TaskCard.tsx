@@ -43,8 +43,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               key={task.id}
               style={[styles.taskCard, { backgroundColor: theme.cardBackground }]}
               onPress={() => {
-                setSelectedTask(task);
-                setShowTaskModal(true);
+                setSelectedTask(task)
+                setShowTaskModal(true)
               }}
             >
               <View style={styles.taskCardContent}>
@@ -78,8 +78,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                   <TouchableOpacity
                     style={[styles.actionButton, styles.completeButton]}
                     onPress={(e) => {
-                      e.stopPropagation();
-                      completeTask(task.id);
+                      e.stopPropagation()
+                      completeTask(task.id)
                     }}
                   >
                      <Ionicons name={'checkmark-outline'} size={12} color={'#4CAF50'}/>
@@ -87,8 +87,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                   <TouchableOpacity
                     style={[styles.actionButton, styles.deleteButton]}
                     onPress={(e) => {
-                      e.stopPropagation();
-                      deleteTask(task.id);
+                      e.stopPropagation()
+                      deleteTask(task.id)
                     }}
                   >
                     <Ionicons name={'trash-outline'} size={12} color={'#f44336'}/>

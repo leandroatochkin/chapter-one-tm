@@ -1,9 +1,22 @@
-// components/DatePicker.web.tsx
-import React from 'react';
-import { View } from 'react-native';
+import React from 'react'
+import { View } from 'react-native'
 
-export const WebDatePicker = ({ value, onChange, theme }: any) => {
-  const formattedDate = value ? new Date(value).toISOString().split('T')[0] : '';
+interface WebDatePickerProps {
+  value: Date | null
+  onChange: (event: { type: string }, date?: Date) => void
+  theme?: {
+    text?: string
+    border?: string
+    [key: string]: any
+  };
+}
+
+export const WebDatePicker: React.FC<WebDatePickerProps> = ({ 
+  value, 
+  onChange, 
+  theme 
+}) => {
+  const formattedDate = value ? new Date(value).toISOString().split('T')[0] : ''
 
   return (
     <View style={{
@@ -18,9 +31,9 @@ export const WebDatePicker = ({ value, onChange, theme }: any) => {
         type="date"
         value={formattedDate}
         onChange={(e) => {
-          const date = e.target.value ? new Date(e.target.value + "T12:00:00") : new Error();
+          const date = e.target.value ? new Date(e.target.value + "T12:00:00") : new Error()
           if (!(date instanceof Error)) {
-            onChange({ type: 'set' }, date);
+            onChange({ type: 'set' }, date)
           }
         }}
         style={{
@@ -35,5 +48,5 @@ export const WebDatePicker = ({ value, onChange, theme }: any) => {
         }}
       />
     </View>
-  );
-};
+  )
+}

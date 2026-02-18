@@ -33,8 +33,10 @@ const MainScreen: React.FC<MainScreenProps> = ({
     deleteTask,
     completeTask,
     tasks,
-    isDarkMode  
+    isDarkMode,
 }) => {
+
+   
 
    const theme = themeFunction(isDarkMode)
 
@@ -63,7 +65,6 @@ const MainScreen: React.FC<MainScreenProps> = ({
         )}
       </ScrollView>
 
-      {/* Floating Add Button */}
       <TouchableOpacity
         style={[styles.floatingButton, { backgroundColor: theme.accent }]}
         onPress={() => setShowAddModal(true)}

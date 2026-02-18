@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {
-  StatusBar,
-  ViewStyle
+  StatusBar
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import MainScreen from '@/screens/MainScreen'
@@ -10,9 +9,10 @@ import ArchiveScreen from '@/screens/ArchiveScreen'
 import LoadingScreen from '@/screens/LoadingScreen'
 import { AddTaskModal } from '@/components/AddTaskModal'
 import { TaskDetailModal } from '@/components/TaskDetailModal'
+import { ConfirmDeleteModal } from '@/components/ConfirmDeleteModal';
 import { NavigationBar } from '@/components/NavigationBar'
 import { styles } from '../lib/styles'
-import { Alignment, Screens } from '../lib/interfaces'
+import { Screens } from '../lib/interfaces'
 import { themeFunction } from '../lib/utils'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as Haptics from 'expo-haptics'
@@ -44,18 +44,18 @@ export default function Index() {
   const [archivedTasks, setArchivedTasks] = useState<Task[]>([])
   const [currentScreen, setCurrentScreen] = useState<Screens>('main') // main, archive, settings
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false)
-  const [buttonAlignment, setButtonAlignment] = useState<Alignment>('center') // left, center, right
   const [showAddModal, setShowAddModal] = useState<boolean>(false)
   const [showTaskModal, setShowTaskModal] = useState<boolean>(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   
-
-  // Form states
   const [taskTitle, setTaskTitle] = useState<string>('')
   const [taskDescription, setTaskDescription] = useState<string>('')
   const [deadline, setDeadline] = useState<Date | null>(null)
   const [selectedReminder, setSelectedReminder] = useState<number | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
+  const [showDeleteWarning, setShowDeleteWarning] = useState<boolean>(true)
+  const [isConfirmModalVisible, setIsConfirmModalVisible] = useState<boolean>(false)
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null)
 
 
   const theme = themeFunction(isDarkMode)
@@ -68,7 +68,7 @@ export default function Index() {
         const savedTasks = await AsyncStorage.getItem('tasks')
         const savedArchive = await AsyncStorage.getItem('archivedTasks')
         const savedDarkMode = await AsyncStorage.getItem('isDarkMode')
-        const savedAlignment = await AsyncStorage.getItem('buttonAlignment')
+        const savedDeleteWarning = await AsyncStorage.getItem('deleteWarning')
 
         if (savedTasks) {
             const parsed = JSON.parse(savedTasks).map((t: any) => ({
@@ -79,7 +79,7 @@ export default function Index() {
           }
         if (savedArchive) setArchivedTasks(JSON.parse(savedArchive))
         if (savedDarkMode) setIsDarkMode(JSON.parse(savedDarkMode))
-        if (savedAlignment) setButtonAlignment(JSON.parse(savedAlignment) as Alignment)
+        if (savedDeleteWarning) setShowDeleteWarning(JSON.parse(savedDeleteWarning))
       } catch (e) {
         console.error("Failed to load data", e)
       } finally {
@@ -109,13 +109,13 @@ export default function Index() {
     const saveSettings = async () => {
       try {
         await AsyncStorage.setItem('isDarkMode', JSON.stringify(isDarkMode))
-        await AsyncStorage.setItem('buttonAlignment', JSON.stringify(buttonAlignment))
+        await AsyncStorage.setItem('deleteWarning', JSON.stringify(showDeleteWarning))
       } catch (e) {
         console.error("Failed to save settings", e)
       }
     }
     saveSettings()
-  }, [isDarkMode, buttonAlignment])
+  }, [isDarkMode, showDeleteWarning])
 
 
   const validateForm = () => {
@@ -130,26 +130,26 @@ export default function Index() {
     return Object.keys(newErrors).length === 0
   }
 
-const addTask = () => {
-  if (!validateForm()) return
+  const addTask = () => {
+    if (!validateForm()) return
 
-  const newTask = {
-    id: Date.now().toString(),
-    title: taskTitle,
-    description: taskDescription,
-    reminder: selectedReminder,
-    deadline: deadline ? deadline.toISOString() : null, // Save as ISO string
-    completed: false,
-    createdAt: new Date(),
+    const newTask = {
+      id: Date.now().toString(),
+      title: taskTitle,
+      description: taskDescription,
+      reminder: selectedReminder,
+      deadline: deadline ? deadline.toISOString() : null, // Save as ISO string
+      completed: false,
+      createdAt: new Date(),
+    }
+
+    setTasks([...tasks, newTask])
+    setDeadline(null)
+    resetForm()
+    setShowAddModal(false)
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+    showToast('Task added!', isDarkMode)
   }
-
-  setTasks([...tasks, newTask])
-  setDeadline(null)
-  resetForm()
-  setShowAddModal(false)
-  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
-  showToast('Task added!', isDarkMode)
-}
 
   const resetForm = () => {
     setTaskTitle('')
@@ -171,7 +171,7 @@ const addTask = () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
       showToast('Task completed! Well done!', isDarkMode)
     }
-  };
+  }
 
   const deleteTask = (taskId: string) => {
     const task = tasks.find((t) => t.id === taskId)
@@ -186,7 +186,7 @@ const addTask = () => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
       showToast('Task deleted.', isDarkMode)
     }
-  };
+  }
 
   const repeatTask = (task: Task) => {
     const newTask = {
@@ -207,11 +207,20 @@ const addTask = () => {
     )   
     setSelectedTask(updatedTask)
     showToast('Task updated!', isDarkMode)
-}
+  }
 
   const removeFromArchive = (taskId: string) => {
     setArchivedTasks(archivedTasks.filter((t) => t.id !== taskId))
     showToast('Task deleted permanently.', isDarkMode)
+  }
+
+  const handleDeletePress = (id: string) => {
+    if (showDeleteWarning) {
+      setTaskToDelete(id)
+      setIsConfirmModalVisible(true)
+    } else {
+      deleteTask(id)
+    }
   }
 
   if (isLoading) {
@@ -221,31 +230,18 @@ const addTask = () => {
               />
   }
 
-  const getAlignmentStyle = (): ViewStyle => {
-  return {
-    alignItems:
-      buttonAlignment === 'left'
-        ? 'flex-start'
-        : buttonAlignment === 'right'
-        ? 'flex-end'
-        : 'center',
-  }
-}
-
-  // Render Main Screen
   const renderMainScreen = () => {
     return <MainScreen 
               setShowAddModal={setShowAddModal}
               setSelectedTask={setSelectedTask}
               setShowTaskModal={setShowTaskModal}
-              deleteTask={deleteTask}
+              deleteTask={handleDeletePress}
               completeTask={completeTask}
               tasks={tasks}
               isDarkMode={isDarkMode}
             />
   }
 
-  // Render Archive Screen
   const renderArchiveScreen = () => {
     return <ArchiveScreen 
               archivedTasks={archivedTasks}
@@ -255,14 +251,12 @@ const addTask = () => {
             />
   }
 
-  // Render Settings Screen
   const renderSettingsScreen = () => {
     return <SettingsScreen 
               isDarkMode={isDarkMode}
               setIsDarkMode={setIsDarkMode}
-              getAlignmentStyle={getAlignmentStyle}
-              setButtonAlignment={setButtonAlignment}
-              buttonAlignment={buttonAlignment}
+              showDeleteWarning={showDeleteWarning}
+              setShowDeleteWarning={setShowDeleteWarning}
             />
   }
     
@@ -300,7 +294,6 @@ const addTask = () => {
         selectedReminder={selectedReminder}
         setSelectedReminder={setSelectedReminder}
         addTask={addTask}
-        getAlignmentStyle={getAlignmentStyle}
         deadline={deadline}
         setDeadline={setDeadline}
       />
@@ -312,9 +305,19 @@ const addTask = () => {
         setSelectedTask={setSelectedTask}
         selectedTask={selectedTask}
         updateTask={updateTask}
-        getAlignmentStyle={getAlignmentStyle}
         completeTask={completeTask}
         deleteTask={deleteTask}
+      />
+
+      <ConfirmDeleteModal
+        visible={isConfirmModalVisible}
+        isDarkMode={isDarkMode}
+        onCancel={() => setIsConfirmModalVisible(false)}
+        onConfirm={(dontShowAgain) => {
+          if (dontShowAgain) setShowDeleteWarning(false);
+          if (taskToDelete) deleteTask(taskToDelete);
+          setIsConfirmModalVisible(false);
+        }}
       />
     </SafeAreaView>
     </RootSiblingParent>

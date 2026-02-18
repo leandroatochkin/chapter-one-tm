@@ -5,8 +5,8 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  ViewStyle,
-  Platform
+  Platform,
+  ScrollView
 } from 'react-native'
 import { 
     styles
@@ -32,11 +32,10 @@ interface AddTaskModalProps {
     taskDescription: string
     setTaskDescription: (description: string) => void
     selectedReminder: number | null
-    setSelectedReminder: (value: number | null) => void,
+    setSelectedReminder: (value: number | null) => void
     addTask: () => void
-    getAlignmentStyle: () => ViewStyle
     setDeadline: (date: Date | null) => void
-    deadline: Date | null;
+    deadline: Date | null
 }
 
 
@@ -54,7 +53,6 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
     selectedReminder,
     setSelectedReminder,
     addTask,
-    getAlignmentStyle,
     setDeadline,
     deadline
 }) => {
@@ -63,9 +61,9 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
     const theme = themeFunction(isDarkMode)
 
     const onDateChange = (event: any, selectedDate?: Date) => {
-        setShowPicker(false);
+        setShowPicker(false)
         if (selectedDate) {
-            setDeadline(selectedDate);
+            setDeadline(selectedDate)
         } else {
             setDeadline(null)
             setSelectedReminder(null)
@@ -80,15 +78,15 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                 statusBarTranslucent={true}
                 navigationBarTranslucent={true}
                 onRequestClose={() => {
-                  setShowAddModal(false);
-                  resetForm();
+                  setShowAddModal(false)
+                  resetForm()
                 }}
               >
                 <View style={styles.modalOverlay}>
                   <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
                     <Text style={[styles.modalTitle, { color: theme.text }]}>Add New Task</Text>
-        
-                    <TextInput
+                    <ScrollView>
+                      <TextInput
                       style={[
                         styles.input,
                         { color: theme.text, borderColor: errors.title ? '#f44336' : theme.border },
@@ -97,8 +95,8 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                       placeholderTextColor={theme.text + '80'}
                       value={taskTitle}
                       onChangeText={(text) => {
-                        setTaskTitle(text);
-                        if (errors.title) setErrors({ ...errors, title: null });
+                        setTaskTitle(text)
+                        if (errors.title) setErrors({ ...errors, title: null })
                       }}
                     />
                     {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
@@ -113,7 +111,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                       placeholderTextColor={theme.text + '80'}
                       value={taskDescription}
                       onChangeText={(text) => {
-                        setTaskDescription(text);
+                        setTaskDescription(text)
                         if (errors.description) setErrors({ ...errors, description: null });
                       }}
                       multiline
@@ -151,7 +149,9 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                       </>
                     )}
         
-                    <Text style={[styles.sectionLabel, { color: theme.text, marginTop: 20 }]}>
+                    {Platform.OS !== 'web' &&                   
+                    <>
+                      <Text style={[styles.sectionLabel, { color: theme.text, marginTop: 20 }]}>
                       Set Reminder (Optional) 
                       {!deadline && <Text style={{ fontSize: 10, color: '#f44336' }}> (Select deadline first)</Text>}
                     </Text>
@@ -160,14 +160,14 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                       {reminderOptions.map((option) => (
                         <TouchableOpacity
                           key={option.value}
-                          disabled={!deadline} // <--- Disable if no deadline
+                          disabled={!deadline} 
                           style={[
                             styles.reminderOption,
                             selectedReminder === option.value && {
                               backgroundColor: theme.accent,
                             },
                             { borderColor: theme.border },
-                            !deadline && { backgroundColor: theme.border + '40' } // Visual feedback
+                            !deadline && { backgroundColor: theme.border + '40' } 
                           ]}
                           onPress={() => setSelectedReminder(option.value)}
                         >
@@ -184,8 +184,10 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                         </TouchableOpacity>
                       ))}
                     </View>
-        
-                    <View style={[styles.modalButtons, getAlignmentStyle()]}>
+                    </>
+                    }
+                    </ScrollView>
+                    <View style={styles.modalButtons}>
                       <TouchableOpacity
                         style={[styles.modalButton, { backgroundColor: '#CCC' }]}
                         onPress={() => {

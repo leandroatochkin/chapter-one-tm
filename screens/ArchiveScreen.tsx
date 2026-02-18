@@ -3,19 +3,19 @@ import {
     Text,
     ScrollView,
     TouchableOpacity
-} from "react-native";
+} from "react-native"
 import { 
     themeFunction
- } from "../lib/utils";
+ } from "../lib/utils"
 import { 
     Task
- } from "../lib/interfaces";
+ } from "../lib/interfaces"
 import { 
     styles
- } from "../lib/styles";
+ } from "../lib/styles"
 import { 
     Ionicons
- } from '@expo/vector-icons';
+ } from '@expo/vector-icons'
 
 interface ArchiveScreenProps {
     archivedTasks: Task[] | [],
@@ -79,7 +79,7 @@ const ArchiveScreen: React.FC<ArchiveScreenProps> = ({
                             style={[styles.actionButton, { backgroundColor: theme.accent }]}
                             onPress={() => repeatTask(task)}
                         >
-                            <Text style={styles.repeatButtonText}>↺</Text>
+                            <Ionicons name={'refresh-outline'} size={18} color={theme.text} />
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[styles.actionButton, styles.deleteButton]}
