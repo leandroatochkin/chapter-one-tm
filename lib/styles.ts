@@ -186,7 +186,7 @@ export const styles = StyleSheet.create({
     marginTop: 20,
   },
   modalButton: {
-    paddingHorizontal: 18,
+    paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 8,
   },

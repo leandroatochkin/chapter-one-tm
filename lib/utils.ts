@@ -15,4 +15,5 @@ export const themeFunction = (isDarkMode: boolean) => {
         accent: '#ff5222',
         border: isDarkMode ? '#37474F' : '#E0E0E0',
     }
-  };
+  }
+

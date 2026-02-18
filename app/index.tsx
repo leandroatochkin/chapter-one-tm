@@ -22,6 +22,7 @@ import { themeFunction } from '../lib/utils';
 
 
 
+
 interface FormErrors {
   title?: string | null
   description?: string | null
@@ -58,8 +59,8 @@ export default function Index() {
   const [isConfirmModalVisible, setIsConfirmModalVisible] = useState<boolean>(false)
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null)
 
-
   const theme = themeFunction(isDarkMode)
+
 
   //load data on startup
   useEffect(() => {
@@ -138,7 +139,7 @@ export default function Index() {
       title: taskTitle,
       description: taskDescription,
       reminder: selectedReminder,
-      deadline: deadline ? deadline.toISOString() : null, // Save as ISO string
+      deadline: deadline ? deadline.toISOString() : null, 
       completed: false,
       createdAt: new Date(),
     }

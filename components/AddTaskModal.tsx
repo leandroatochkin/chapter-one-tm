@@ -1,21 +1,21 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import {
-  Text,
-  View,
-  TouchableOpacity,
   Modal,
-  TextInput,
   Platform,
-  ScrollView
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native'
-import { 
-    styles
- } from '../lib/styles'
-import { 
-    themeFunction,
-    reminderOptions
- } from '../lib/utils'
 import { FormErrors } from '../lib/interfaces'
+import {
+  styles
+} from '../lib/styles'
+import {
+  reminderOptions,
+  themeFunction
+} from '../lib/utils'
 import { MobileDatePicker } from './DatePicker'
 import { WebDatePicker } from './DatePickerWeb'
 
@@ -57,24 +57,39 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
     deadline
 }) => {
     
-    const [showPicker, setShowPicker] = useState<boolean>(false);
+    const [showPicker, setShowPicker] = useState<boolean>(false)
+    const [pickerMode, setPickerMode] = useState<'date' | 'time'>('date')
     const theme = themeFunction(isDarkMode)
 
     const onDateChange = (event: any, selectedDate?: Date) => {
-        setShowPicker(false)
-        if (selectedDate) {
-            setDeadline(selectedDate)
+    // If the user cancels the picker
+    if (event.type === 'dismissed') {
+        setShowPicker(false);
+        setPickerMode('date'); 
+        return;
+    }
+
+    if (selectedDate) {
+        setDeadline(selectedDate);
+
+        if (Platform.OS === 'android' && pickerMode === 'date') {
+            // Step 1: Date picked, now trigger Time
+            setShowPicker(false); // Close date
+            setPickerMode('time');
+            setTimeout(() => setShowPicker(true), 100); // Re-open as time
         } else {
-            setDeadline(null)
-            setSelectedReminder(null)
+            // Step 2: Time picked (or iOS which handles things differently)
+            setShowPicker(false);
+            setPickerMode('date');
         }
     }
+};
 
     return (
         <Modal
                 visible={showAddModal}
                 transparent
-                animationType="slide"
+                animationType='slide'
                 statusBarTranslucent={true}
                 navigationBarTranslucent={true}
                 onRequestClose={() => {
@@ -91,7 +106,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                         styles.input,
                         { color: theme.text, borderColor: errors.title ? '#f44336' : theme.border },
                       ]}
-                      placeholder="Task Title"
+                      placeholder='Task Title'
                       placeholderTextColor={theme.text + '80'}
                       value={taskTitle}
                       onChangeText={(text) => {
@@ -107,7 +122,7 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                         styles.textArea,
                         { color: theme.text, borderColor: errors.description ? '#f44336' : theme.border },
                       ]}
-                      placeholder="Task Description"
+                      placeholder='Task Description'
                       placeholderTextColor={theme.text + '80'}
                       value={taskDescription}
                       onChangeText={(text) => {
@@ -127,23 +142,35 @@ export const AddTaskModal: React.FC<AddTaskModalProps> = ({
                       <WebDatePicker 
                         value={deadline} 
                         onChange={onDateChange} 
-                        theme={theme} 
+                        theme={theme}
                       />
                     ) : (
                       <>
                         <TouchableOpacity 
                           style={[styles.input, { justifyContent: 'center', borderColor: theme.border }]}
-                          onPress={() => setShowPicker(true)}
+                          onPress={() => {
+                            setPickerMode('date');
+                            setShowPicker(true);
+                          }}
                         >
                           <Text style={{ color: deadline ? theme.text : theme.text + '80' }}>
-                            {deadline ? deadline.toLocaleDateString() : "Select a date..."}
-                          </Text>
+                          {deadline 
+                            ? deadline.toLocaleString([], { 
+                                day: '2-digit', 
+                                month: '2-digit', 
+                                year: '2-digit', 
+                                hour: '2-digit', 
+                                minute: '2-digit' 
+                              }) 
+                            : 'Select date & time...'}
+                        </Text>
                         </TouchableOpacity>
 
                         {showPicker && (
                           <MobileDatePicker
                             value={deadline || new Date()}
                             onChange={onDateChange}
+                            mode={pickerMode}
                           />
                         )}
                       </>

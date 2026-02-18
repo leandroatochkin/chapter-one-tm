@@ -89,7 +89,7 @@ npm run web
 
 ### Completing a Task
 - **Quick complete**: Tap the checkmark button on the task card
-- **From details**: Tap the task card, then tap **Done** button
+- **From details**: Tap the task card, then tap **Complete** button
 - Completed tasks move to the Archive
 
 ### Deleting a Task
@@ -131,3 +131,5 @@ npm run web
 
 
 **Note**: This app uses local storage only. All data is stored on the device and not synced to any cloud service.
+
+**Environment Note**: This is a Sandbox version of the Task Manager. While reminders are functional within the app, system-wide notifications are disabled in the Preview environment. For full background alerts, a native production build is required.

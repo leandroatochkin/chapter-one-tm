@@ -43,6 +43,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   const [editedDesc, setEditedDesc] = useState<string>('')
   const [editedDeadline, setEditedDeadline] = useState<Date | null>(null)
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false)
+  const [pickerMode, setPickerMode] = useState<'date' | 'time'>('date')
 
   useEffect(() => {
     if (selectedTask) {
@@ -57,6 +58,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
     setShowTaskModal(false)
     setSelectedTask(null)
     setIsEditing(false)
+    setPickerMode('date') 
   }
 
   const handleSave = () => {
@@ -73,29 +75,34 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
   }
 
   const onDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(false)
+    if (event.type === 'dismissed') {
+      setShowDatePicker(false)
+      setPickerMode('date')
+      return
+    }
+
     if (selectedDate) {
       setEditedDeadline(selectedDate)
+      
+      if (Platform.OS === 'android' && pickerMode === 'date') {
+        // Step 1 finished, move to Step 2 (Time)
+        setShowDatePicker(false)
+        setPickerMode('time')
+        setTimeout(() => setShowDatePicker(true), 100)
+      } else {
+        // Finished or iOS
+        setShowDatePicker(false)
+        setPickerMode('date')
+      }
     }
   }
 
   if (!selectedTask) return null
 
-  const currentReminderLabel = reminderOptions.find(
-    (opt) => opt.value === selectedTask.reminder
-  )?.label || 'No reminder set'
-
   return (
-    <Modal
-      visible={showTaskModal}
-      transparent
-      animationType="fade"
-      statusBarTranslucent={true}
-      onRequestClose={handleClose}
-    >
+    <Modal visible={showTaskModal} transparent animationType='fade' statusBarTranslucent={true} onRequestClose={handleClose}>
       <View style={styles.modalOverlay}>
         <View style={[styles.modalContent, { backgroundColor: theme.background }]}>
-          
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
             <View style={{ flex: 1 }}>
               {isEditing ? (
@@ -110,7 +117,7 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
             </View>
             {!isEditing && (
               <TouchableOpacity onPress={handleClose} style={{ padding: 5, marginLeft: 10 }}>
-                <Text style={{ color: theme.text, fontSize: 24, fontWeight: '300' }}>×</Text>
+                <Ionicons name='close' size={28} color={theme.text} />
               </TouchableOpacity>
             )}
           </View>
@@ -126,35 +133,36 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
               />
             ) : (
               <Text style={[styles.taskDetailDescription, { color: theme.text }]}>
-                {selectedTask.description || "No description provided."}
+                {selectedTask.description || 'No description provided.'}
               </Text>
             )}
-
             <Text style={[styles.sectionLabel, { color: theme.text, marginTop: 20 }]}>DEADLINE</Text>
             
             {isEditing ? (
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                 {Platform.OS === 'web' ? (
                   <View style={{ flex: 1 }}>
-                    <WebDatePicker 
-                      value={editedDeadline} 
-                      onChange={onDateChange} 
-                      theme={theme} 
-                    />
+                    <WebDatePicker value={editedDeadline} onChange={onDateChange} theme={theme} />
                   </View>
                 ) : (
                   <>
                     <TouchableOpacity 
                       style={[styles.input, { flex: 1, justifyContent: 'center', borderColor: theme.border, marginBottom: 0 }]}
-                      onPress={() => setShowDatePicker(true)}
+                      onPress={() => {
+                        setPickerMode('date')
+                        setShowDatePicker(true)
+                      }}
                     >
                       <Text style={{ color: editedDeadline ? theme.text : theme.text + '80' }}>
-                        {editedDeadline ? editedDeadline.toLocaleDateString() : "Select a date..."}
+                        {editedDeadline 
+                          ? editedDeadline.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) 
+                          : 'Select date and time...'}
                       </Text>
                     </TouchableOpacity>
                     {showDatePicker && (
                       <MobileDatePicker
                         value={editedDeadline || new Date()}
+                        mode={pickerMode}
                         onChange={onDateChange}
                       />
                     )}
@@ -162,65 +170,39 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 )}
                 
                 {editedDeadline && (
-                  <TouchableOpacity 
-                    onPress={() => setEditedDeadline(null)}
-                    style={{ marginLeft: 10, padding: 10 }}
-                  >
-                    <Text style={{ color: '#f44336' }}>Clear</Text>
+                  <TouchableOpacity onPress={() => setEditedDeadline(null)} style={{ marginLeft: 10, padding: 10 }}>
+                    <Ionicons name="trash-outline" size={20} color="#f44336" />
                   </TouchableOpacity>
                 )}
               </View>
             ) : (
-              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Ionicons name="calendar-outline" size={16} color={theme.text}/>
-              <Text style={{ color: theme.text, fontSize: 16, marginTop: 5 }}>
-               {selectedTask.deadline ? new Date(selectedTask.deadline).toLocaleDateString() : "No deadline"}
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 5 }}>
+                <Ionicons name='calendar-outline' size={18} color={theme.accent}/>
+                <Text style={{ color: theme.text, fontSize: 16 }}>
+                  {selectedTask.deadline 
+                    ? new Date(selectedTask.deadline).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) 
+                    : "No deadline set"}
+                </Text>
               </View>
             )}
 
-            <Text style={[styles.sectionLabel, { color: theme.text, marginTop: 20 }]}>
-              REMINDER {!editedDeadline && isEditing && <Text style={{fontSize: 10, color: '#f44336'}}> (Set deadline first)</Text>}
-            </Text>
-            
-            {isEditing ? (
-              <View style={[styles.reminderOptions, !editedDeadline && { opacity: 0.5 }]}>
-                {reminderOptions.map((option) => (
-                  <TouchableOpacity
-                    key={option.value}
-                    disabled={!editedDeadline}
-                    style={[
-                      styles.reminderOption,
-                      selectedTask.reminder === option.value && { backgroundColor: theme.accent },
-                      { borderColor: theme.border },
-                    ]}
-                    onPress={() => updateTask({ ...selectedTask, reminder: option.value })}
-                  >
-                    <Text style={[styles.reminderOptionText, { color: selectedTask.reminder === option.value ? '#FFF' : theme.text }]}>
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            ) : (
-              <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Ionicons name="alarm-outline" size={16} color={theme.text}/> 
-              <Text style={{ color: theme.text, fontSize: 16, marginTop: 5 }}>
-                {currentReminderLabel}
+            <Text style={[styles.sectionLabel, { color: theme.text, marginTop: 20 }]}>REMINDER</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 5 }}>
+              <Ionicons name="notifications-outline" size={18} color={theme.accent}/> 
+              <Text style={{ color: theme.text, fontSize: 16 }}>
+                {reminderOptions.find(opt => opt.value === selectedTask.reminder)?.label || 'No reminder set'}
               </Text>
-              </View>
-            )}
+            </View>
           </ScrollView>
 
           <View style={styles.modalButtons}>
             {isEditing ? (
               <>
                 <TouchableOpacity style={[styles.modalButton, { backgroundColor: '#4CAF50' }]} onPress={handleSave}>
-                  <Text style={styles.modalButtonText}>Save</Text>
+                  <Text style={styles.modalButtonText}>Save Changes</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.modalButton, { backgroundColor: '#CCC' }]} onPress={() => setIsEditing(false)}>
-                  <Text 
-                    style={styles.modalButtonText}>Cancel</Text>
+                  <Text style={styles.modalButtonText}>Cancel</Text>
                 </TouchableOpacity>
               </>
             ) : (
@@ -230,18 +212,14 @@ export const TaskDetailModal: React.FC<TaskDetailModalProps> = ({
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={[styles.modalButton, { backgroundColor: '#4CAF50' }]} 
-                  onPress={() => { 
-                                  completeTask(selectedTask.id)
-                                  handleClose()
-                                    }}>
-                  <Text style={styles.modalButtonText}>Done</Text>
+                  onPress={() => { completeTask(selectedTask.id); handleClose(); }}
+                >
+                  <Text style={styles.modalButtonText}>Complete</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={[styles.modalButton, { backgroundColor: '#f44336' }]} 
-                  onPress={() => { 
-                                  deleteTask(selectedTask.id) 
-                                  handleClose() 
-                                    }}>
+                  onPress={() => { deleteTask(selectedTask.id); handleClose(); }}
+                >
                   <Text style={styles.modalButtonText}>Delete</Text>
                 </TouchableOpacity>
               </>
