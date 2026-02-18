@@ -1,15 +1,14 @@
 import { 
     View,
     Text,
-    TouchableOpacity,
-    ViewStyle
-} from "react-native";
+    TouchableOpacity
+} from "react-native"
 import { 
     themeFunction
- } from "../lib/utils";
+ } from "../lib/utils"
 import { 
     styles
- } from "../lib/styles";
+ } from "../lib/styles"
 
  interface SettingScreenProps {
     isDarkMode: boolean,

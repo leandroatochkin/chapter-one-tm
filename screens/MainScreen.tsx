@@ -3,17 +3,17 @@ import {
     Text,
     ScrollView,
     TouchableOpacity
-} from "react-native";
+} from "react-native"
 import { 
     themeFunction
- } from "../lib/utils";
+ } from "../lib/utils"
 import { 
     Task
- } from "../lib/interfaces";
+ } from "../lib/interfaces"
 import { 
     styles
- } from "../lib/styles";
- import { TaskCard } from "@/components/TaskCard";
+ } from "../lib/styles"
+ import { TaskCard } from "@/components/TaskCard"
 
 
 interface MainScreenProps {
