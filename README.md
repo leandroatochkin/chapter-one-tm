@@ -1,50 +1,133 @@
-# Welcome to your Expo app 👋
+# Task Manager App - React Native
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A comprehensive Task Manager application built with React Native and Expo, featuring task management, archiving, reminders, and customizable settings.
 
-## Get started
+## Features
 
-1. Install dependencies
+### Core Features 
+-  **Add Tasks**: Create new tasks with title and description
+-  **Mark as Complete**: Mark tasks as completed and archive them
+-  **Delete Tasks**: Delete tasks from archive permanently
+-  **Task List**: View all active tasks in a scrollable list
+-  **User Interface**: Clean, intuitive UI with visual feedback
+-  **State Management**: Local component state with AsyncStorage persistence
 
-   ```bash
-   npm install
-   ```
+### Enhanced Features
+- **Task Archive**: View all completed and deleted tasks
+- **Restore Tasks**: Bring archived tasks back to the main list
+- **Reminders**: Set reminders (15min, 30min, 1h, 6h, 12h, 24h) (only on mobile)
+- **Form Validation**: All fields required before submission
+- **Theme Support**: Light and Dark mode
+- **Responsive Design**: Works on all screen sizes
+- **Feedback**: Visual and haptic feedback to actions
+- **Task Details**: Tap to view/edit task information
+- **Data Persistence**: All data saved to device storage
 
-2. Start the app
+## Installation & Setup
 
-   ```bash
-   npx expo start
-   ```
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+- Expo CLI (will be installed with dependencies)
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### Step 1: Clone repo
 
 ```bash
-npm run reset-project
+git clone https://github.com/leandroatochkin/chapter-one-tm
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Step 2: Install Dependencies
 
-## Learn more
+```bash
+cd chapter-one-tm
+npm install or yarn install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### Step 3: Start the Development Server
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npx expo start
+```
 
-## Join the community
+### Step 4: Run on Device/Emulator
 
-Join our community of developers creating universal apps.
+#### iOS (Mac only)
+```bash
+npm run ios
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+#### Android
+```bash
+npm run android
+```
+
+#### Web
+```bash
+npm run web
+```
+
+#### Using Expo Go App
+1. Install Expo Go on your iOS/Android device
+2. Scan the QR code shown in the terminal
+3. The app will load on your device
+
+## Usage Guide
+
+### Adding a Task
+1. Tap the floating **+** button (orange circle with plus icon)
+2. Enter a task title (required)
+3. Enter a task description (required)
+4. Optionally set a deadline for the task
+4. Optionally set a reminder time (if in mobile)
+5. Tap **Add Task**
+
+### Viewing Tasks
+- All active tasks appear on the main screen
+- Scroll through the list to see all tasks
+- Tasks with reminders show a clock icon
+- Tap any task card to view full details and edit if desired
+
+### Completing a Task
+- **Quick complete**: Tap the checkmark button on the task card
+- **From details**: Tap the task card, then tap **Done** button
+- Completed tasks move to the Archive
+
+### Deleting a Task
+- **Quick delete**: Tap the trash icon on the task card
+- **From details**: Tap the task card, then tap **Delete** button
+- Deleted tasks move to the Archive
+
+### Archive Screen
+- Access via bottom navigation (Archive)
+- View all completed and deleted tasks
+- **Restore**: Bring task back to main list
+- **Remove**: Permanently delete from archive
+- Status badges show if task was completed or deleted
+
+### Settings
+- Access via bottom navigation (Settings)
+- **Dark Mode**: Toggle between light and dark themes
+- **Delete confirmation**: Choose if you want to see a warning before deleting a task
+
+## Technical Details
+
+### Dependencies
+- **react**: 19.1.0
+- **react-native**: 0.81.5
+- **expo**: ~54.0.33
+- **@react-native-async-storage/async-storage**: For data persistence
+- **@expo/vector-icons**: For icons (Ionicons)
+- **react-native-root-siblings**: For injecting toast notifications in the top of the visual hierarchy
+- **react-native-root-toast**: For toast notifications
+- **react-native-safe-area-context**: Replacement for deprecated safe-area
+- **expo-haptics**: For haptics
+- **@react-native-community/datetimepicker**: For date picking
+
+### State Management
+- Uses React hooks (useState, useEffect)
+- Local component state for UI
+- AsyncStorage for persistent data storage
+
+
+
+**Note**: This app uses local storage only. All data is stored on the device and not synced to any cloud service.
