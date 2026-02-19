@@ -307,7 +307,7 @@ export default function Index() {
         selectedTask={selectedTask}
         updateTask={updateTask}
         completeTask={completeTask}
-        deleteTask={deleteTask}
+        deleteTask={handleDeletePress}
       />
 
       <ConfirmDeleteModal
